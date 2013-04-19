@@ -23,6 +23,20 @@ class Histogram
     @total += 1
   end
 
+  def full_range
+    bins = @freq.keys.map &:to_f
+    min_range, max_range = [bins.min, bins.max]
+
+    range = []
+    r = min_range
+    while (r <= max_range) do
+      range << r
+      r += @step
+    end
+
+    range
+  end
+
   def calc_stars(freq, max_freq)
 
     num_stars = freq.to_f
@@ -39,11 +53,18 @@ class Histogram
     min = @freq.values.min;
     max = @freq.values.max;
 
-    bins = @freq.keys.sort
+    bins = @freq.keys
+
+    if @complete
+      bins = self.full_range
+    else
+      bins.sort!
+    end
 
     bins.each do |i|
-      stars = self.calc_stars(@freq[i], max)
-      puts "%6s | %6d | %s" % [ sprintf("%3.3f", i * step), @freq[i], '*' * stars ]
+      k = i.to_i
+      stars = self.calc_stars(@freq[k], max)
+      puts "%6s | %6d | %s" % [ sprintf("%3.3f", i * step), @freq[k], '*' * stars ]
     end
     puts "TOTAL  | %6d |" % total
   end
@@ -60,6 +81,11 @@ if __FILE__ == $0
       options[:step] = step.to_f
     end
 
+    options[:complete] = false
+    opts.on('-f', '--full', 'Show the full histogram range') do
+      options[:complete] = true
+    end
+
     options[:columns] = 80
     opts.on('-c', '--columns COLUMNS', 'max width of histogram (default=80)') do |cols|
       options[:columns] = cols.to_i
@@ -73,7 +99,7 @@ if __FILE__ == $0
 
   optparse.parse!
 
-  h = Histogram.new(options[:step], options[:columns])
+  h = Histogram.new(options[:step], options[:columns], options[:complete])
 
   ARGF.each_line do |e|
     data = e.strip.to_f
