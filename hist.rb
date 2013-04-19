@@ -6,65 +6,89 @@
 
 require 'optparse'
 
-def get_range(min_range, max_range, step)
-  range = []
+class Histogram
+  attr_accessor :step, :complete, :columns, :total
 
-  r = min_range
-  while (r <= max_range) do
-    range << r
-    r += step
+  def initialize(stepsize=1.0, columns=80, complete=false)
+    @freq     = Hash.new(0)
+    @total    = 0
+    @step     = stepsize
+    @columns  = columns
+    @complete = complete
   end
 
-  range
-end
-
-def calc_stars(freq, max_freq)
-  cols = ENV['COLUMNS'] || 80
-
-  num_stars = freq.to_f
-
-  if max_freq >= cols
-    num_stars = ((freq.to_f / max_freq) * cols)
+  def record(data)
+    bin = (data/@step).to_i
+    @freq[bin] += 1
+    @total += 1
   end
 
-  num_stars
-end
-
-def histogram(freq={}, total=0, step=1, complete=false)
-
-  min = freq.values.min;
-  max = freq.values.max;
-
-  bins = freq.keys.map &:to_s
-  bins.map! &:to_f
-
-  if complete
+  def full_range
+    bins = @freq.keys.map &:to_f
     min_range, max_range = [bins.min, bins.max]
-    bins = get_range(min_range, max_range, step)
-  else
-    bins.sort!
+
+    range = []
+    r = min_range
+    while (r <= max_range) do
+      range << r
+      r += @step
+    end
+
+    range
   end
 
-  bins.each do |i|
-    k = i.to_i.to_s.to_sym
-    stars = calc_stars(freq[k], max)
-    puts "%6s | %6d | %s" % [ sprintf("%3.3f", i * step), freq[k], '*' * stars ]
+  def calc_stars(freq, max_freq)
+
+    num_stars = freq.to_f
+
+    if max_freq >= @columns
+      num_stars = ((freq.to_f / max_freq) * @columns)
+    end
+
+    num_stars
   end
-  puts "TOTAL  | %6d |" % total
+
+  def show()
+
+    min = @freq.values.min;
+    max = @freq.values.max;
+
+    bins = @freq.keys
+
+    if @complete
+      bins = self.full_range
+    else
+      bins.sort!
+    end
+
+    bins.each do |i|
+      k = i.to_i
+      stars = self.calc_stars(@freq[k], max)
+      puts "%6s | %6d | %s" % [ sprintf("%3.3f", i * step), @freq[k], '*' * stars ]
+    end
+    puts "TOTAL  | %6d |" % total
+  end
 end
+
+
 
 if __FILE__ == $0
   options = {}
 
   optparse = OptionParser.new do |opts|
     options[:step] = 1.0
-    opts.on('-s', '--step STEPSIZE', 'set the bin size (default=1.0)') do |step|
-      options[:step] = step
+    opts.on('-s', '--step STEPSIZE', 'set the bin width (default=1.0)') do |step|
+      options[:step] = step.to_f
     end
 
     options[:complete] = false
-    opts.on('-c', '--complete', 'Show the full histogram range') do
+    opts.on('-f', '--full', 'Show the full histogram range') do
       options[:complete] = true
+    end
+
+    options[:columns] = 80
+    opts.on('-c', '--columns COLUMNS', 'max width of histogram (default=80)') do |cols|
+      options[:columns] = cols.to_i
     end
 
     opts.on('-h', '--help', 'show the help menu') do
@@ -75,17 +99,12 @@ if __FILE__ == $0
 
   optparse.parse!
 
-  stepsize = options[:step].to_f
-  freq  = Hash.new(0)
-  total = 0
+  h = Histogram.new(options[:step], options[:columns], options[:complete])
 
   ARGF.each_line do |e|
     data = e.strip.to_f
-    bin  = (data/stepsize).to_i.to_s.to_sym
-    freq[bin] += 1
-    total += 1
+    h.record(data)
   end
 
-  histogram(freq, total, stepsize, options[:complete])
-  puts "\n"
+  h.show
 end
