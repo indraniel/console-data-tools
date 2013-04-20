@@ -6,72 +6,72 @@
 
 require 'optparse'
 
-class Histogram
-  attr_accessor :step, :complete, :columns, :total
+module ConsoleTools
+  class Histogram
+    attr_accessor :step, :complete, :columns, :total
 
-  def initialize(stepsize=1.0, columns=80, complete=false)
-    @freq     = Hash.new(0)
-    @total    = 0
-    @step     = stepsize
-    @columns  = columns
-    @complete = complete
-  end
-
-  def record(data)
-    bin = (data/@step).to_i
-    @freq[bin] += 1
-    @total += 1
-  end
-
-  def full_range
-    bins = @freq.keys.map { |i| i * @step }
-    min_range, max_range = [bins.min, bins.max]
-
-    range = []
-    r = min_range
-    while (r <= max_range) do
-      range << r
-      r += @step
-      r = (r * 100).round / 100.0 # round to .01
+    def initialize(stepsize=1.0, columns=80, complete=false)
+      @freq     = Hash.new(0)
+      @total    = 0
+      @step     = stepsize
+      @columns  = columns
+      @complete = complete
     end
 
-    range
-  end
-
-  def calc_stars(freq, max_freq)
-
-    num_stars = freq.to_f
-
-    if max_freq >= @columns
-      num_stars = ((freq.to_f / max_freq) * @columns)
+    def record(data)
+      bin = (data/@step).to_i
+      @freq[bin] += 1
+      @total += 1
     end
 
-    num_stars
-  end
+    def full_range
+      bins = @freq.keys.map { |i| i * @step }
+      min_range, max_range = [bins.min, bins.max]
 
-  def show()
-
-    min = @freq.values.min;
-    max = @freq.values.max;
-
-    bins = @freq.keys
-
-    if @complete
-      bins = self.full_range
-      bins.each do |i|
-        k = (i/@step).round
-        stars = self.calc_stars(@freq[k], max)
-        puts "%6s | %6d | %s" % [ sprintf("%3.3f", i), @freq[k], '*' * stars ]
+      range = []
+      r = min_range
+      while (r <= max_range) do
+        range << r
+        r += @step
+        r = (r * 100).round / 100.0 # round to .01
       end
-    else
-      bins.sort!
-      bins.each do |i|
-        stars = self.calc_stars(@freq[i], max)
-        puts "%6s | %6d | %s" % [ sprintf("%3.3f", i * @step), @freq[i], '*' * stars ]
-      end
+
+      range
     end
 
-    puts "TOTAL  | %6d |" % total
+    def calc_stars(freq, max_freq)
+      num_stars = freq.to_f
+
+      if max_freq >= @columns
+        num_stars = ((freq.to_f / max_freq) * @columns)
+      end
+
+      num_stars
+    end
+
+    def show()
+      min = @freq.values.min;
+      max = @freq.values.max;
+
+      bins = @freq.keys
+
+      if @complete
+        bins = self.full_range
+        bins.each do |i|
+          k = (i/@step).round
+          stars = self.calc_stars(@freq[k], max)
+          puts "%6s | %6d | %s" % [ sprintf("%3.3f", i), @freq[k], '*' * stars ]
+        end
+      else
+        bins.sort!
+        bins.each do |i|
+          stars = self.calc_stars(@freq[i], max)
+          puts "%6s | %6d | %s" % [ sprintf("%3.3f", i * @step), @freq[i], '*' * stars ]
+        end
+      end
+
+      puts "TOTAL  | %6d |" % total
+    end
   end
 end
 
@@ -104,7 +104,7 @@ if __FILE__ == $0
 
   optparse.parse!
 
-  h = Histogram.new(options[:step], options[:columns], options[:complete])
+  h = ConsoleTools::Histogram.new(options[:step], options[:columns], options[:complete])
 
   ARGF.each_line do |e|
     data = e.strip.to_s
