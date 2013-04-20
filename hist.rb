@@ -26,13 +26,10 @@ class Histogram
   def full_range
     bins = @freq.keys.map { |i| i * @step }
     min_range, max_range = [bins.min, bins.max]
-#    puts "min_range: #{min_range}"
-#    puts "max_range: #{max_range}"
 
     range = []
     r = min_range
     while (r <= max_range) do
-#      puts " -- r: #{r} #{((r*100).round/100.0)}) -- "
       range << r
       r += @step
       r = (r * 100).round / 100.0 # round to .01
@@ -63,7 +60,6 @@ class Histogram
       bins = self.full_range
       bins.each do |i|
         k = (i/@step).round
-#        puts "i: #{i} k: #{k}: (i/@step): #{(i/@step)} rounded: #{(i/@step).round} "
         stars = self.calc_stars(@freq[k], max)
         puts "%6s | %6d | %s" % [ sprintf("%3.3f", i), @freq[k], '*' * stars ]
       end
