@@ -102,7 +102,9 @@ if __FILE__ == $0
   h = Histogram.new(options[:step], options[:columns], options[:complete])
 
   ARGF.each_line do |e|
-    data = e.strip.to_f
+    data = e.strip.to_s
+    next if data.empty?
+    data = data.to_f
     h.record(data)
   end
 
