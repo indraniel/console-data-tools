@@ -17,18 +17,19 @@ module ConsoleTools
     # "The P^2 Algorithm for Dynamic Calculation of Quantiles and Histograms
     #  Without Storing Observations"
     # see http://www.cs.wustl.edu/~jain/papers/ftp/psqr.pdf
-    attr_accessor :quantile, :desired_positions, :positions, :heights, :startup,
+    attr_accessor :tile, :desired_positions, :positions, :heights, :threshold_flag,
                   :delta_positions
 
     def initialize(quantile=0.5)
-      @quantile  = quantile
+      @tile      = quantile
       @heights   = Array.new
       @positions = (1..5).to_a
       @desired_positions = [1, 1 + 2*quantile, 1 + 4*quantile, 3 + 2*quantile, 5]
       @delta_positions = [0, quantile/2, quantile, (1 + quantile)/2, 1]
-      @startup   = false
+      @threshold_flag   = false
     end
 
+    # this is the core algorithm
     def record(data)
       # collect the 1st 5 observations
       if @heights.length != 5
@@ -38,39 +39,92 @@ module ConsoleTools
 
       # sort the 1st 5 observations
       # (only for the first time we get to this section of code)
-      if @startup == false
+      if @threshold_flag == false
         @heights.sort!
-        @startup = true
+        @threshold_flag = true
       end
 
-      k = 0
+      # Part B1: find the cell interval the new observation resides in
+      k = case
+          when data < @heights[0]
+            # data observation is the lowest thing seen so far
+            @heights[0] = data
+            0
+          when (@heights[0]...@heights[1]).include?(data)
+            0
+          when (@heights[1]...@heights[2]).include?(data)
+            1
+          when (@heights[2]...@heights[3]).include?(data)
+            2
+          when (@heights[3]...@heights[4]).include?(data)
+            3
+          else
+            # if the data observation is the highest thing seen so far
+            @heights[4] = data
+            3
+      end
 
-      # data observation is the lowest thing seen so far
-      if data < @heights[0]
-        @heights[0] = data
-        k = 1
+      # Part B2.a: increment all the positions that are greater than index k
+      @positions.each_index do |i|
+        @positions[i] += 1 if i >= k
+      end
+#      puts "k: #{k}"
+#      puts "positions: #{@positions}"
 
-      # check if data observation is in the range of middle three markers
-      else
-        (1...@heights.length).to_a.each do |i|
-          if @heights[i-1] <= data && data < @heights[i]
-            k = i
-            break
+      # Part B2.b: increment the desired positions for all markers
+      @desired_positions = @desired_positions.
+                               zip(@delta_positions).
+                               map { |i| i[0] + i[1] }
+
+      # Part B3: adjust marker heights
+      1.upto(3) do |i|
+        delta = @desired_positions[i] - @positions[i]
+        forward_position_delta  = @positions[i+1] - @positions[i]
+        backward_position_delta = @positions[i-1] - @positions[i]
+
+        if (delta >= 1 && forward_position_delta > 1) || 
+           (delta <= -1 && backward_position_delta < -1)
+          sign = delta <=> 0
+          new_height = self.quadratic_extrapolation(
+            @heights[i+1],
+            @heights[i],
+            @heights[i-1],
+            sign,
+            @positions[i+1],
+            @positions[i],
+            @positions[i-1]
+          )
+
+          # linearly interpolate height if the quadratically extrapolated height
+          # isn't in the desired range
+          if not ( (@heights[i-1]...@heights[i+1]).include?(new_height) )
+            new_height = self.linear_extrapolation(
+              sign,
+              @heights[i],
+              @heights[i+sign],
+              @positions[i],
+              @positions[i+sign],
+            )
           end
+
+          @heights[i] = new_height
+#          puts "prior positions: #{@positions}"
+          @positions[i] = @positions[i] + sign
+#          puts "i: #{i} -- sign: #{sign} -- positions: #{@positions}"
         end
       end
 
-      # if the data observation is the highest thing seen so far
-      if k == 0 
-        k = 4
-        @heights[-1] = data if @heights[-1] < data
-      end
-
-      # increment all the positions 
-
+#      puts "data: #{data} | positions: #{@positions} | heights: #{@heights}"
     end
 
-    def p2(qp1, q, qm1, d, np1, n, nm1)
+    def linear_extrapolation(d, q, qd, n, nd)
+      c1 = qd - q
+      c2 = nd - n
+      q_new = q + d * (c1/c2)
+      return q_new
+    end
+
+    def quadratic_extrapolation(qp1, q, qm1, d, np1, n, nm1)
       c1 = d / (np1 - nm1)
       c2 = (n - nm1 + d) * (qp1 - q) / (np1 - n)
       c3 = (np1 - n - d) * (q - qm1) / (n - nm1)
@@ -80,12 +134,10 @@ module ConsoleTools
     end
 
     def quantile
+      # this center element is the approximate quantile of interest
+      q = @threshold_flag ? @heights[2] : 0
+      return q
     end
-
-    private
-    def adjust_markers
-    end
-
   end
 
   class SummaryStats
@@ -99,6 +151,7 @@ module ConsoleTools
       @variance = 0.0
       @skew     = 0.0
       @kurtosis = 0.0
+      @quantiles = quantiles.map {|i| ConsoleTools::EstimatedQuantile.new(i)}
     end
 
     def record(data)
@@ -120,6 +173,8 @@ module ConsoleTools
 
       # Sample skewness (except for the scaling term)
       @skew = @skew + (data - @mean)**3.0
+
+      @quantiles.each { |q| q.record(data) }
     end
 
     def show
@@ -130,6 +185,10 @@ module ConsoleTools
       puts "%-10s : %10f" % ["variance", self.sample_variance]
       puts "%-10s : %10f" % ["skew", self.sample_skew]
       puts "%-10s : %10f" % ["kurtosis", self.sample_kurtosis]
+
+      @quantiles.each do |q|
+        puts "%-10s : %10f" % ["quantile (#{q.tile})", q.quantile]
+      end
     end
 
     def sample_variance
