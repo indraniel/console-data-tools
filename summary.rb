@@ -128,7 +128,7 @@ module ConsoleTools
     end
 
     def quantile
-      # this center element is the approximate quantile of interest
+      # the center element is the actual quantile being estimated
       q = @threshold_flag ? @heights[2] : 0
       return q
     end
