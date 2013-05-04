@@ -216,23 +216,12 @@ if __FILE__ == $0
 
   h = ConsoleTools::SummaryStats.new(quantiles=options[:tiles])
 
-  storage = Array.new
   ARGF.each_line do |e|
     data = e.strip.to_s
     next if data.empty?
     data = data.to_f
     h.record(data)
-    storage << data
   end
 
   h.show
-
-  storage.sort!
-  theoretical_median = storage[ (storage.length * 0.5).to_i  ]
-  theoretical_top    = storage[ (storage.length * 0.75).to_i ]
-  theoretical_bottom = storage[ (storage.length * 0.25).to_i ]
-
-  puts "Theoretical top    is: #{theoretical_top}"
-  puts "Theoretical median is: #{theoretical_median}"
-  puts "Theoretical bottom is: #{theoretical_bottom}"
 end
