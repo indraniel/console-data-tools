@@ -66,10 +66,8 @@ module ConsoleTools
 
       # Part B2.a: increment all the positions that are greater than index k
       @positions.each_index do |i|
-        @positions[i] += 1 if i >= k
+        @positions[i] += 1 if i > k
       end
-#      puts "k: #{k}"
-#      puts "positions: #{@positions}"
 
       # Part B2.b: increment the desired positions for all markers
       @desired_positions = @desired_positions.
@@ -85,16 +83,19 @@ module ConsoleTools
         if (delta >= 1 && forward_position_delta > 1) || 
            (delta <= -1 && backward_position_delta < -1)
           sign = delta <=> 0
+          extrapolation = 'quadratic'
           new_height = self.quadratic_extrapolation(
             @heights[i+1],
             @heights[i],
             @heights[i-1],
-            sign,
-            @positions[i+1],
-            @positions[i],
-            @positions[i-1]
+            sign.to_f,
+            @positions[i+1].to_f,
+            @positions[i].to_f,
+            @positions[i-1].to_f
           )
+          puts "i: #{i} -- new_height: #{new_height}"
 
+#          puts "i: #{i} -- low bound: #{@heights[i-1]} -- up bound: #{@heights[i+1]} -- calc: #{new_height}"
           # linearly interpolate height if the quadratically extrapolated height
           # isn't in the desired range
           if not ( (@heights[i-1]...@heights[i+1]).include?(new_height) )
@@ -105,22 +106,25 @@ module ConsoleTools
               @positions[i],
               @positions[i+sign],
             )
+            extrapolation = 'linear'
           end
 
           @heights[i] = new_height
 #          puts "prior positions: #{@positions}"
           @positions[i] = @positions[i] + sign
 #          puts "i: #{i} -- sign: #{sign} -- positions: #{@positions}"
+          puts "extrapolation: #{extrapolation}"
         end
       end
 
-#      puts "data: #{data} | positions: #{@positions} | heights: #{@heights}"
+      puts "item: #{sprintf("%.6f", data)} -- #{@desired_positions} -- #{@positions} -- #{@heights}"
     end
 
     def linear_extrapolation(d, q, qd, n, nd)
       c1 = qd - q
       c2 = nd - n
       q_new = q + d * (c1/c2)
+      puts "line_extra - d: #{d} q: #{q} qd: #{qd} n: #{n} nd: #{nd} q_new: #{q_new}"
       return q_new
     end
 
@@ -130,6 +134,8 @@ module ConsoleTools
       c3 = (np1 - n - d) * (q - qm1) / (n - nm1)
 
       q_new = q + c1 * (c2 + c3)
+      print "quad_extra - qp1: #{qp1} q: #{q} qm1: #{qm1} d: #{d} "
+      puts  "np1: #{np1} n: #{n} nm1: #{nm1} q_new: #{q_new}"
       return q_new
     end
 
@@ -222,12 +228,23 @@ if __FILE__ == $0
 
   h = ConsoleTools::SummaryStats.new(quantiles=options[:tiles])
 
+  storage = Array.new
   ARGF.each_line do |e|
     data = e.strip.to_s
     next if data.empty?
     data = data.to_f
     h.record(data)
+    storage << data
   end
 
   h.show
+
+  storage.sort!
+  theoretical_median = storage[ (storage.length * 0.5).to_i  ]
+  theoretical_top    = storage[ (storage.length * 0.75).to_i ]
+  theoretical_bottom = storage[ (storage.length * 0.25).to_i ]
+
+  puts "Theoretical top    is: #{theoretical_top}"
+  puts "Theoretical median is: #{theoretical_median}"
+  puts "Theoretical bottom is: #{theoretical_bottom}"
 end
