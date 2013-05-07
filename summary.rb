@@ -8,6 +8,7 @@ require 'optparse'
 module ConsoleTools
   class ExactQuantile
     def initialize
+      @@storage
     end
 
     def collect
@@ -154,9 +155,10 @@ module ConsoleTools
 
   class SummaryStats
     attr_accessor :count, :min, :max,
-                  :mean, :variance, :kurtosis, :skew, :quantiles
+                  :mean, :variance, :kurtosis, :skew, :quantiles,
+                  :quantiles_approach
 
-    def initialize(quantiles=[0.5])
+    def initialize(quantiles=[0.5], quantiles_method='approximate')
       @min      = (2**(0.size * 8 -2) -1)  # ruby system FIXNUM_MAX
       @max      = -(2**(0.size * 8 -2))    # ruby system FIXNUM_MIN
       @count    = 0
@@ -164,7 +166,13 @@ module ConsoleTools
       @variance = 0.0
       @skew     = 0.0
       @kurtosis = 0.0
-      @quantiles = quantiles.map {|i| ConsoleTools::EstimatedQuantile.new(i)}
+      @quantiles_approach = quantiles_method
+
+      if @quantiles_approach == 'approximate'
+        @quantiles = quantiles.map {|i| ConsoleTools::EstimatedQuantile.new(i)}
+      else
+        @quantiles = quantiles.map {|i| ConsoleTools::ExactQuantile.new(i)}
+      end
     end
 
     def record(data)
@@ -187,7 +195,11 @@ module ConsoleTools
       # Sample skewness (except for the scaling term)
       @skew = @skew + (data - @mean)**3.0
 
-      @quantiles.each { |q| q.record(data) }
+      if @quantiles_approach == 'approximate'
+        @quantiles.each { |q| q.record(data) }
+      else
+        @quantiles.class.record(data)
+      end
     end
 
     def show
@@ -230,15 +242,18 @@ if __FILE__ == $0
       options[:tiles] = list 
     end
 
-    options[:exact] = false
+    options[:quantile_calculation] = 'approximate'
     opts.on('-e', '--exact', 'Calculate exact quantiles') do
-      options[:exact] = true
+      options[:quantile_calculation] = 'exact'
     end
   end
 
   optparse.parse!
 
-  h = ConsoleTools::SummaryStats.new(quantiles=options[:tiles])
+  h = ConsoleTools::SummaryStats.new(
+    quantiles=options[:tiles],
+    quantiles_method=options[:quantile_calculation]
+  )
 
   ARGF.each_line do |e|
     data = e.strip.to_s
