@@ -17,14 +17,21 @@ module ConsoleTools
     # "The P^2 Algorithm for Dynamic Calculation of Quantiles and Histograms
     #  Without Storing Observations"
     # see http://www.cs.wustl.edu/~jain/papers/ftp/psqr.pdf
-    attr_accessor :tile, :desired_positions, :positions, :heights, :threshold_flag,
-                  :delta_positions
+    attr_accessor :tile, :desired_positions,
+                  :positions, :heights,
+                  :threshold_flag, :delta_positions
 
     def initialize(quantile=0.5)
       @tile      = quantile
       @heights   = Array.new
       @positions = (1..5).to_a
-      @desired_positions = [1, 1 + 2*quantile, 1 + 4*quantile, 3 + 2*quantile, 5]
+      @desired_positions = [
+        1,
+        1 + 2*quantile,
+        1 + 4*quantile,
+        3 + 2*quantile,
+        5
+      ]
       @delta_positions = [0, quantile/2, quantile, (1 + quantile)/2, 1]
       @threshold_flag   = false
     end
@@ -93,8 +100,8 @@ module ConsoleTools
             @positions[i-1].to_f
           )
 
-          # linearly interpolate height if the quadratically extrapolated height
-          # isn't in the desired range
+          # linearly interpolate height if the quadratically extrapolated
+          # height isn't in the desired range
           if not ( (@heights[i-1]...@heights[i+1]).include?(new_height) )
             new_height = self.linear_extrapolation(
               sign,
@@ -135,7 +142,8 @@ module ConsoleTools
   end
 
   class SummaryStats
-    attr_accessor :count, :min, :max, :mean, :variance, :kurtosis, :skew, :quantiles
+    attr_accessor :count, :min, :max,
+                  :mean, :variance, :kurtosis, :skew, :quantiles
 
     def initialize(quantiles=[0.5])
       @min      = (2**(0.size * 8 -2) -1)  # ruby system FIXNUM_MAX
