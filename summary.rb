@@ -6,6 +6,17 @@
 require 'optparse'
 
 module ConsoleTools
+  class ExactQuantile
+    def initialize
+    end
+
+    def collect
+    end
+
+    def calculate_quantiles
+    end
+  end
+
   class EstimatedQuantile
     # This class is designed to work for large numerical datasets.
     #
@@ -217,6 +228,11 @@ if __FILE__ == $0
     opts.on('-t', '--tiles x,y,z', Array, description) do |list|
       list.map! { |i| i.to_f }
       options[:tiles] = list 
+    end
+
+    options[:exact] = false
+    opts.on('-e', '--exact', 'Calculate exact quantiles') do
+      options[:exact] = true
     end
   end
 
