@@ -7,14 +7,31 @@ require 'optparse'
 
 module ConsoleTools
   class ExactQuantile
-    def initialize
-      @@storage
+    attr_accessor :tile
+    @@storage = []
+    @@storage_sorted = false
+
+    def initialize(tile=0.5)
+      @tile = tile
     end
 
-    def collect
+    def self.record(data)
+      @@storage << data
     end
 
-    def calculate_quantiles
+    def quantile
+      if not @@storage_sorted
+        @@storage.sort!
+      end
+
+      if (@tile == 0.5) && @@storage.length.even?
+        first = (@@storage.length * @tile).to_i
+        second = first + 1
+        avg = (@@storage[first] + @@storage[second])/2.0
+        return avg
+      end
+
+      return @@storage[ (@@storage.length * @tile).to_i ]
     end
   end
 
@@ -198,7 +215,7 @@ module ConsoleTools
       if @quantiles_approach == 'approximate'
         @quantiles.each { |q| q.record(data) }
       else
-        @quantiles.class.record(data)
+        @quantiles.first.class.record(data)
       end
     end
 
