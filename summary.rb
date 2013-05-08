@@ -25,7 +25,7 @@ module ConsoleTools
       end
 
       if (@tile == 0.5) && @@storage.length.even?
-        first = (@@storage.length * @tile).to_i
+        first = ((@@storage.length * @tile).to_i - 1)
         second = first + 1
         avg = (@@storage[first] + @@storage[second])/2.0
         return avg
