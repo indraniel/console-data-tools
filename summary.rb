@@ -229,7 +229,11 @@ module ConsoleTools
       puts "%-10s : %10f" % ["kurtosis", self.sample_kurtosis]
 
       @quantiles.each do |q|
-        puts "%-10s : %10f" % ["quantile (#{q.tile})", q.quantile]
+        if q.class == ConsoleTools::EstimatedQuantile
+          puts "%-10s : %10f" % ["Est. quantile (#{q.tile})", q.quantile]
+        else
+          puts "%-10s : %10f" % ["quantile (#{q.tile})", q.quantile]
+        end
       end
     end
 
