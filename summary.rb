@@ -207,7 +207,7 @@ module ConsoleTools
       @variance = @variance + delta * (data - @mean)
 
       # Sample kurtosis (except for the scaling term)
-      @kurtosis = @kurtosis = (data - @mean)**4.0
+      @kurtosis = @kurtosis + (data - @mean)**4.0
 
       # Sample skewness (except for the scaling term)
       @skew = @skew + (data - @mean)**3.0
