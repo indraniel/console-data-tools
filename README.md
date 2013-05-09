@@ -1,21 +1,24 @@
 Console Tools
 =============
 
-These are some hacky scripts that I had in my bin for doing cheap
-and quick data analysis. It would probably be better to use a more
-suitable tool such as [R][R], [NumPy][NumPy]/[SciPy][SciPy], [PDL][PDL],
-or something similar. But, who has the patience to formally
-clean up and import the data into these tools when presented with
-excitement of a new and unknown data set? These scripts are meant for
-quick gratification.
+These are some hacky scripts that I had in my bin for doing quick and
+easy data analysis. It would probably be better to use a more suitable
+tool such as [R][R], [NumPy][NumPy]/[SciPy][SciPy], [PDL][PDL], or
+something similar. But, who always has the patience to formally clean up
+and import the data into these tools when presented with an exciting new
+and unknown data set? These scripts are meant for quick gratification.
 
 The tools all receive data by either piping (typically downstream of
 standard tools like `awk`, `sed`, `cut`, `perl`, etc.), or from a raw
 file consisting of a single column of numbers. Non-numeric data is
 skipped.
 
-*Beware, these are some of my earliest work with Ruby. There are probably
-non-idiomatic expressions and approaches galore throughout the scripts.*
+*Beware, these scripts are some of my earliest explorations with Ruby.
+There are probably non-idiomatic expressions and approaches galore
+throughout the code.*
+
+There are many similar tools like these or better on github. These were
+simply developed for my edification.
 
 Scripts
 =======
@@ -23,7 +26,8 @@ Scripts
 `summary.rb`
 ------------
 
-* Display basic stats on a data set: min, max, mean, variance, skew, kurtosis, quantiles
+* Display basic stats on a data set: min, max, mean, variance, skew,
+  kurtosis, quantiles
 
     Usage: summary [options]
         -t, --tiles x,y,z                list tiles of interest (default: "0.25,0.5,0.75")
@@ -121,9 +125,9 @@ Notice that the estimated quantiles differ from true quantiles by less than 1%.
      1.700 |      2 |
     TOTAL  |  10000 |
 
-[R]:
-[NumPy]:
-[SciPy]:
-[PDL]: 
+[R]: http://www.r-project.org
+[NumPy]: http://www.numpy.org
+[SciPy]: http://www.scipy.org
+[PDL]: http://pdl.perl.org
 [p2-algorithm]: http://www.cs.wustl.edu/~jain/papers/ftp/psqr.pdf
 [livestats]: https://bitbucket.org/scassidy/livestats
