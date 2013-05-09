@@ -1,24 +1,25 @@
-Console Tools
-=============
+Console Data Tools
+==================
 
-These are some hacky scripts that I had in my bin for doing quick and
-easy data analysis. It would probably be better to use a more suitable
-tool such as [R][R], [NumPy][NumPy]/[SciPy][SciPy], [PDL][PDL], or
-something similar. But, who always has the patience to formally clean up
-and import the data into these tools when presented with an exciting new
-and unknown data set? These scripts are meant for quick gratification.
+These are some hacky scripts for doing quick and easy data analysis.
+It would probably be more suitable to use a tool such as [R][R],
+[NumPy][NumPy]/[SciPy][SciPy], [PDL][PDL], or something similar. But,
+who always has the patience to formally clean up and import the data
+into these tools when presented with an exciting new and unknown data
+set? These scripts are meant for quick gratification.
 
 The tools all receive data by either piping (typically downstream of
 standard tools like `awk`, `sed`, `cut`, `perl`, etc.), or from a raw
 file consisting of a single column of numbers. Non-numeric data is
 skipped.
 
-*Beware, these scripts are some of my earliest explorations with Ruby.
-There are probably non-idiomatic expressions and approaches galore
-throughout the code.*
+There are similar tools like these or better created by others on
+github. These were simply developed for my own edification.
 
-There are many similar tools like these or better on github. These were
-simply developed for my edification.
+*These scripts are some of my earliest explorations with Ruby. There are
+probably non-idiomatic expressions and approaches galore throughout the
+code.*
+
 
 Scripts
 =======
