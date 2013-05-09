@@ -19,6 +19,7 @@ module ConsoleTools
     def quantile
       if not @@storage_sorted
         @@storage.sort!
+        @@storage_sorted = true
       end
 
       if (@tile == 0.5) && @@storage.length.even?
