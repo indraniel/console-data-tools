@@ -173,7 +173,7 @@ module ConsoleTools
                   :mean, :variance, :kurtosis, :skew, :quantiles,
                   :quantiles_approach
 
-    def initialize(quantiles=[0.5], quantiles_method='approximate')
+    def initialize(quantiles=[0.5], quantiles_method=:approximate)
       @min      = (2**(0.size * 8 -2) -1)  # ruby system FIXNUM_MAX
       @max      = -(2**(0.size * 8 -2))    # ruby system FIXNUM_MIN
       @count    = 0
@@ -183,7 +183,7 @@ module ConsoleTools
       @kurtosis = 0.0
       @quantiles_approach = quantiles_method
 
-      if @quantiles_approach == 'approximate'
+      if @quantiles_approach == :approximate
         @quantiles = quantiles.map {|i| ConsoleTools::EstimatedQuantile.new(i)}
       else
         @quantiles = quantiles.map {|i| ConsoleTools::ExactQuantile.new(i)}
@@ -214,7 +214,7 @@ module ConsoleTools
       @skew = @skew + (data - @mean)**3.0
 
       # quantiles
-      if @quantiles_approach == 'approximate'
+      if @quantiles_approach == :approximate
         @quantiles.each { |q| q.record(data) }
       else
         @quantiles.first.class.record(data)
@@ -265,9 +265,9 @@ if __FILE__ == $0
       options[:tiles] = list 
     end
 
-    options[:quantile_calculation] = 'approximate'
+    options[:quantile_calculation] = :approximate
     opts.on('-e', '--exact', 'Calculate exact quantiles') do
-      options[:quantile_calculation] = 'exact'
+      options[:quantile_calculation] = :exact
     end
   end
 
