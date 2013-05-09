@@ -30,9 +30,9 @@ Scripts
 * Display basic stats on a data set: min, max, mean, variance, skew,
   kurtosis, quantiles
 
-    Usage: summary [options]
-        -t, --tiles x,y,z                list tiles of interest (default: "0.25,0.5,0.75")
-        -e, --exact                      Calculate exact quantiles
+        Usage: summary [options]
+            -t, --tiles x,y,z                list tiles of interest (default: "0.25,0.5,0.75")
+            -e, --exact                      Calculate exact quantiles
 
 * The script was designed to work on very large datasets, where the data
   may not be able to reside all in memory. The quantile calculations are
@@ -80,11 +80,11 @@ Notice that the estimated quantiles differ from true quantiles by less than 1%.
 
 * Display a histogram.
 
-    Usage: hist [options]
-        -s, --step STEPSIZE              set the bin width (default=1.0)
-        -f, --full                       Show the full histogram range
-        -c, --columns COLUMNS            max width of histogram (default=80)
-        -h, --help                       show the help menu
+        Usage: hist [options]
+            -s, --step STEPSIZE              set the bin width (default=1.0)
+            -f, --full                       Show the full histogram range
+            -c, --columns COLUMNS            max width of histogram (default=80)
+            -h, --help                       show the help menu
 
 ### Example ###
 
