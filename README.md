@@ -36,9 +36,10 @@ Scripts
 
 * The script was designed to work on very large datasets, where the data
   may not be able to reside all in memory. The quantile calculations are
-  estimated using a sampling approach described in the following paper,
-  ["blah"][p2-algorithm]. This approach was inspired by [LiveStats by
-  Sean Cassidy on bitbucket][livestats].
+  estimated using an algorithm described in the following paper, ["The P^2
+  Algorithm for Dynamic Calculation of Quantiles and Histograms Without
+  Storing Observations"][p2-algorithm]. This approach was inspired by
+  [LiveStats by Sean Cassidy on bitbucket][livestats].
 
 * Use the `--exact` option on a small dataset, where memory usage is not
   a concern. It will calculate the exact quantile informaion by storing
