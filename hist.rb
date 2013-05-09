@@ -1,8 +1,4 @@
 #!/usr/bin/env ruby
-#
-# curl -s -L "http://ichart.finance.yahoo.com/table.csv?s=GOOG&d=3&e=19&f=2013&g=d&a=7&b=19&c=2004&ignore=.csv" |cut -d, -f5 |tail -n +2 | ./hist.rb -s 10.0
-#
-# awk 'func r(){return sqrt(-2*log(rand()))*cos(6.2831853*rand())}BEGIN{for(i=0;i<10000;i++)s=s"\n"0.5*r();print s}' | ./hist.rb -s 0.1 -f
 
 require 'optparse'
 
