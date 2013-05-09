@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-# For skewness and kurtosis calculations:
-# http://www.itl.nist.gov/div898/handbook/eda/section3/eda35b.htm
-
 require 'optparse'
 
 module ConsoleTools
@@ -206,12 +203,16 @@ module ConsoleTools
       # Sample variance (except for the scaling term)
       @variance = @variance + delta * (data - @mean)
 
+      # For skewness and kurtosis calculations see:
+      # http://www.itl.nist.gov/div898/handbook/eda/section3/eda35b.htm
+
       # Sample kurtosis (except for the scaling term)
       @kurtosis = @kurtosis + (data - @mean)**4.0
 
       # Sample skewness (except for the scaling term)
       @skew = @skew + (data - @mean)**3.0
 
+      # quantiles
       if @quantiles_approach == 'approximate'
         @quantiles.each { |q| q.record(data) }
       else
