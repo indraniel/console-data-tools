@@ -36,8 +36,8 @@ module ConsoleTools
   class EstimatedQuantile
     # This class is designed to work for large numerical datasets.
     #
-    # Class instances estimate a given quantile by calculating them
-    # dynamically as data points are observed, via a set of 5 statistical
+    # Class instances estimate a given quantile by calculating it
+    # dynamically as data points are observed via a set of 5 statistical
     # counters. IT DOES NOT STORE ANY OF THE OBSERVATIONS.
     #
     # It is based upon the following paper
