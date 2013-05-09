@@ -41,11 +41,11 @@ Scripts
   Storing Observations"][p2-algorithm]. This approach was inspired by
   [LiveStats by Sean Cassidy on bitbucket][livestats].
 
-* Use the `--exact` option on a small dataset, where memory usage is not
-  a concern. It will calculate the exact quantile informaion by storing
-  all the data points in memory.
+* Use the `--exact` option on a small dataset where memory usage is
+  not a concern. Enabling this option will calculate the exact quantile
+  information by storing all the data points in memory.
 
-* By default the `--exact` is not applied
+* By default, the `--exact` option is not enabled.
 
 ### Examples ###
 
