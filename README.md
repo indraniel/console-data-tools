@@ -1,11 +1,11 @@
 Console Data Tools
 ==================
 
-These are some hacky scripts for doing quick and easy data analysis.
+These are some hacky scripts for doing quick exploratory data analysis.
 It would probably be more suitable to use a tool such as [R][R],
 [NumPy][NumPy]/[SciPy][SciPy], [PDL][PDL], or something similar. But,
 who always has the patience to formally clean up and import the data
-into these tools when presented with an exciting new and unknown data
+into these tools when presented with an exciting new and unexplored data
 set? These scripts are meant for quick gratification.
 
 The tools all receive data by either piping (typically downstream of
